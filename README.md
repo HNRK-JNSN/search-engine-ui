@@ -11,3 +11,6 @@ This project is a basic Blazor WebAssembly frontend application. It demonstrates
 
 Your search will be sent to a mock echo server that will reply with the HTTP data structure received.
 
+## Usefull links
+
+- [How to use Docker environment variables for Blazor WebAssembly’s configuration appsettings.json](https://medium.com/@yoann.visentin/blazor-webassembly-docker-environment-variables-and-appsettings-json-3106dfedff90)

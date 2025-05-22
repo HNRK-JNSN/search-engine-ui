@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.Extensions.Configuration;
+@inject IConfiguration Configuration
 
 <PageTitle>Searcher</PageTitle>
 
@@ -10,10 +12,12 @@
     <ValidationSummary />
 
     <div class="mb-3">
-        <label for="searchInput" class="form-label">Search</label>
-        <InputText id="searchInput" class="form-control form-control-lg" @bind-Value="searchModel.Query" />
+        <div class="input-group">
+            <InputText id="searchInput" class="form-control form-control-lg" @bind-Value="searchModel.Query" />
+            <button type="button" class="btn btn-secondary" style="margin-left: 0.5rem;" @onclick="() => {searchModel.Query = string.Empty; responseBody = string.Empty;}">Clear</button>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary btn-lg w-100">Send</button>
+    <button type="submit" class="btn btn-primary btn-lg w-100">Submit Search</button>
 </EditForm>
 
 @if (!string.IsNullOrEmpty(responseBody))
@@ -28,11 +32,11 @@
 
 @code {
     private SearchModel searchModel = new();
-    private string responseBody;
+    private string? responseBody;
 
     private async Task HandleValidSubmit()
     {
-        var apiUrl = Environment.GetEnvironmentVariable("SEARCH_UI_API_URL") ?? "http://localhost:8082/search";
+        var apiUrl = Configuration["SEARCH_UI_API_URL"] ?? "http://localhost:8082/undefined";
         using var http = new HttpClient();
         var response = await http.PostAsJsonAsync(apiUrl, searchModel);
         responseBody = await response.Content.ReadAsStringAsync();

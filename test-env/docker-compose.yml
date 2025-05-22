@@ -2,7 +2,7 @@
 services:
   
   search-ui:
-    image: search-ui:latest
+    image: hnrkjnsn/search-ui:1.0.0
     container_name: search-ui
     build:
       context: ..
@@ -10,7 +10,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SEARCH_UI_API_URL=http://mock-server:8082
+      - SEARCH_UI_API_URL=http://localhost:8080/search
   
   mock-server:
     image: mendhak/http-https-echo:latest

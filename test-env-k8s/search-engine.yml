@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search-ui
+  template:
+    metadata:
+      labels:
+        app: search-ui
+    spec:
+      containers:
+        - name: search-ui
+          image: hnrkjnsn/search-ui:1.0.0
+          ports:
+            - containerPort: 4000
+          imagePullPolicy: Always
+          env:
+            - name: SEARCH_UI_API_URL
+              value: "http://localhost:4000/search"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-ui
+spec:
+  type: NodePort
+  ports:
+    - port: 4000
+      targetPort: 4000
+      nodePort: 30080
+  selector:
+    app: search-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mock-server
+  template:
+    metadata:
+      labels:
+        app: mock-server
+    spec:
+      containers:
+        - name: mock-server
+          image: mendhak/http-https-echo:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HTTP_PORT
+              value: "8080"
+            - name: CORS_ALLOW_ORIGIN
+              value: "*"
+            - name: CORS_ALLOW_METHODS
+              value: "GET,POST,PUT,DELETE,OPTIONS,HEAD"
+            - name: CORS_ALLOW_HEADERS
+              value: "Content-Type,Authorization,X-Requested-With,Accept"
+            - name: CORS_ALLOW_CREDENTIALS
+              value: "true"
+            - name: CORS_MAX_AGE
+              value: "3600"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-server
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: mock-server
