@@ -13,9 +13,12 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*
 
+RUN apk add jq
+COPY ["./startup.sh", "/docker-entrypoint.d/40-script.sh"]
+
 COPY --from=build /app/out/wwwroot ./
 COPY nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 8080
+EXPOSE 4000
 
 CMD ["nginx", "-g", "daemon off;"]
