@@ -1,0 +1,48 @@
+﻿@page "/"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Searcher</PageTitle>
+
+<h1>Searcher</h1>
+
+<EditForm Model="@searchModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="searchInput" class="form-label">Search</label>
+        <InputText id="searchInput" class="form-control form-control-lg" @bind-Value="searchModel.Query" />
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg w-100">Send</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(responseBody))
+{
+    <div class="mt-4 border rounded p-3">
+        <h5 style="background-color: darkblue; color: white; margin-top: -1rem; margin-left: -1rem; margin-right: -1rem; padding: 0.75rem 1rem 0.75rem 1rem; border-top-left-radius: 0.375rem; border-top-right-radius: 0.375rem;">
+            Your answer:
+        </h5>
+        <pre>@responseBody</pre>
+    </div>
+}
+
+@code {
+    private SearchModel searchModel = new();
+    private string responseBody;
+
+    private async Task HandleValidSubmit()
+    {
+        var apiUrl = Environment.GetEnvironmentVariable("SEARCH_UI_API_URL") ?? "http://localhost:8082/search";
+        using var http = new HttpClient();
+        var response = await http.PostAsJsonAsync(apiUrl, searchModel);
+        responseBody = await response.Content.ReadAsStringAsync();
+
+    }
+
+    public class SearchModel
+    {
+        [Required]
+        public string Query { get; set; }
+    }
+
+}

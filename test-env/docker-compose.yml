@@ -1,0 +1,27 @@
+
+services:
+  
+  search-ui:
+    image: search-ui:latest
+    container_name: search-ui
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SEARCH_UI_API_URL=http://mock-server:8082
+  
+  mock-server:
+    image: mendhak/http-https-echo:latest
+    container_name: mock-server
+    ports:
+      - "8082:8080"
+    environment:
+      HTTP_PORT: 8080 
+      CORS_ALLOW_ORIGIN: '*'
+      CORS_ALLOW_METHODS: 'GET,POST,PUT,DELETE,OPTIONS,HEAD' # Common HTTP methods, including OPTIONS for preflight
+      CORS_ALLOW_HEADERS: 'Content-Type,Authorization,X-Requested-With,Accept' # Common headers
+      CORS_ALLOW_CREDENTIALS: 'true' # Set to 'true' if your frontend sends credentials (cookies, auth headers)
+      CORS_MAX_AGE: '3600' # How long the preflight request results can be cached (in seconds)
+    restart: unless-stopped 
